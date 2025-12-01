@@ -7,16 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- 系統核心風格 (維持一致) --- */
+        /* --- 系統核心風格 --- */
         body { background-color: #f8f9fa; font-family: "Microsoft JhengHei", sans-serif; height: 100vh; display: flex; flex-direction: column; }
         .header-section { background-color: #2c3e50; color: white; padding: 15px 0; flex-shrink: 0; }
         
+        /* 主容器佈局 */
         .main-container { flex-grow: 1; display: flex; overflow: hidden; }
         .sidebar { width: 320px; background: white; border-right: 1px solid #dee2e6; display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #dee2e6; background-color: #f1f3f5; }
         .list-group-scroll { overflow-y: auto; flex-grow: 1; }
         
-        /* 側邊欄選單樣式 */
         .camera-group-title { font-size: 0.85rem; font-weight: bold; padding: 10px 15px; background-color: #f8f9fa; color: #6c757d; border-bottom: 1px solid #dee2e6; }
         .list-group-item { border: none; border-bottom: 1px solid #f1f1f1; cursor: pointer; padding-left: 25px; transition: 0.2s; }
         .list-group-item:hover { background-color: #e9ecef; }
@@ -24,51 +24,70 @@
 
         .content-area { flex-grow: 1; padding: 20px; overflow-y: auto; background-color: #ecf0f3; }
         
-        /* 播放器樣式 (修改處) */
+        /* 播放器與控制區 (預設桌機版) */
         .video-player-container { 
             background-color: black; 
-            width: 75%; /* 修改: 寬度縮小為 75% (縮小 1/4) */
-            margin: 0 auto; /* 修改: 置中對齊 */
+            width: 75%; 
+            margin: 0 auto; 
             aspect-ratio: 16/9; 
             position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
         }
         
         .video-placeholder { color: #495057; text-align: center; }
         .live-badge { position: absolute; top: 15px; right: 15px; background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; animation: pulse 1.5s infinite; }
         .history-badge { position: absolute; top: 15px; right: 15px; background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: none; }
         
-        /* 時間軸與控制區 (配合播放器寬度調整) */
-        .timeline-container { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-top: 15px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            width: 75%; /* 同步縮小寬度 */
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        /* 下載區塊 (配合播放器寬度調整) */
-        .download-panel { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            margin-top: 15px; 
-            border-left: 5px solid #0d6efd; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-            width: 75%; /* 同步縮小寬度 */
-            margin-left: auto;
-            margin-right: auto;
-        }
+        /* 控制區寬度 */
+        .timeline-container, .download-panel, .player-header-row { width: 75%; margin: 0 auto; }
+        .timeline-container { background: white; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .download-panel { background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 5px solid #0d6efd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* --- [關鍵修改] 行動版 RWD 設定 --- */
+        @media (max-width: 768px) {
+            body { height: auto; min-height: 100vh; overflow-y: auto; } /* 解除高度鎖定，允許捲動 */
+            
+            .main-container { 
+                flex-direction: column; /* 改為垂直排列 */
+                overflow: visible; 
+            }
+            
+            .sidebar { 
+                width: 100%; /* 列表滿版 */
+                height: auto; 
+                max-height: 250px; /* 限制列表高度 */
+                border-right: none; 
+                border-bottom: 5px solid #dee2e6; /* 分隔線 */
+                order: 2; /* 可選：如果想把列表放到影片下方，改這個順序。目前設為2讓它在內容下方，或設為0在上方 */
+                order: 0; /* 讓列表在最上方方便切換 */
+            }
+            
+            .content-area { 
+                width: 100%; 
+                overflow: visible; 
+                padding: 10px; /* 減少邊距 */
+                order: 1;
+            }
+
+            /* 手機版播放器與控制區改為 100% 寬度 */
+            .video-player-container, 
+            .timeline-container, 
+            .download-panel, 
+            .player-header-row { 
+                width: 100% !important; 
+            }
+
+            /* 標題與分頁按鈕垂直排列 */
+            .d-flex.justify-content-between.align-items-end {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+            .nav-pills { width: 100%; justify-content: center; display: flex; }
+        }
     </style>
 </head>
 <body>
@@ -76,11 +95,10 @@
 <div class="header-section shadow-sm">
     <div class="container-fluid px-4">
         <div class="row align-items-center">
-            <div class="col-md-6">
-                <h4 class="m-0"><i class="fas fa-video me-2"></i>台南環保局非法棄置智慧圍籬系統</h4>
-                <small class="text-white-50">即時影像監看與歷史調閱下載</small>
+            <div class="col-md-6 col-12">
+                <h4 class="m-0"><i class="fas fa-video me-2"></i>影像調閱</h4>
             </div>
-            <div class="col-md-6 text-end">
+            <div class="col-md-6 col-12 text-md-end d-none d-md-block">
                 <span class="badge bg-light text-dark"><i class="fas fa-user-clock me-1"></i>系統時間: <span id="sysTime">Loading...</span></span>
             </div>
         </div>
@@ -91,6 +109,10 @@
     
     <div class="sidebar">
         <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center mb-2 d-md-none">
+                <small class="text-muted">選擇監控點位</small>
+                <i class="fas fa-chevron-down text-muted"></i>
+            </div>
             <div class="input-group input-group-sm">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                 <input type="text" class="form-control" placeholder="搜尋攝影機...">
@@ -126,8 +148,8 @@
     <div class="content-area">
         <div class="container-fluid p-0" style="max-width: 1200px; margin: 0 auto;">
             
-            <div class="d-flex justify-content-between align-items-end mb-3" style="width: 75%; margin: 0 auto;">
-                <div>
+            <div class="d-flex justify-content-between align-items-end mb-3 player-header-row">
+                <div class="mb-2 mb-md-0">
                     <h5 class="fw-bold m-0 text-dark" id="currentCamTitle"><i class="fas fa-camera me-2"></i>官田區-烏山頭-CAM01</h5>
                     <small class="text-muted">設備編號: CAM-GT-01</small>
                 </div>
@@ -159,17 +181,16 @@
 
             <div id="historyControls" class="timeline-container" style="display: none;">
                 <div class="row g-3 align-items-center mb-3">
-                    <div class="col-md-2 fw-bold text-secondary">
+                    <div class="col-md-2 col-12 fw-bold text-secondary">
                         <i class="fas fa-calendar-alt me-1"></i>調閱日期
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-12">
                         <input type="date" id="historyDateInput" class="form-control">
-                        <div class="form-text text-muted small">僅提供最近 30 天內影像查閱</div>
                     </div>
-                    <div class="col-md-2 fw-bold text-secondary text-md-end">
+                    <div class="col-md-2 col-12 fw-bold text-secondary text-md-end">
                         <i class="fas fa-clock me-1"></i>時間點
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-12">
                         <input type="time" class="form-control" value="09:00">
                     </div>
                 </div>
@@ -189,19 +210,19 @@
                 </div>
                 
                 <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
+                    <div class="col-md-4 col-12">
                         <label class="form-label small fw-bold">下載日期</label>
                         <input type="date" id="dlDate" class="form-control bg-light" readonly>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <label class="form-label small fw-bold">開始時間</label>
                         <input type="time" id="dlStartTime" class="form-control" value="09:00:00" step="1">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <label class="form-label small fw-bold">結束時間</label>
                         <input type="time" id="dlEndTime" class="form-control" value="09:05:00" step="1">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-12 col-md-2">
                         <button class="btn btn-primary w-100" onclick="validateAndDownload()">
                             <i class="fas fa-download"></i> 下載
                         </button>
@@ -216,13 +237,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // 1. 系統時間更新
     setInterval(() => {
         const now = new Date();
         document.getElementById('sysTime').innerText = now.toLocaleString('zh-TW', { hour12: false });
     }, 1000);
 
-    // 2. 初始化日期限制 (30天內)
     document.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
         const thirtyDaysAgo = new Date();
@@ -230,33 +249,23 @@
 
         const dateInput = document.getElementById('historyDateInput');
         const dlDateInput = document.getElementById('dlDate');
-
-        // 格式化 YYYY-MM-DD
         const maxDate = today.toISOString().split('T')[0];
         const minDate = thirtyDaysAgo.toISOString().split('T')[0];
 
         dateInput.max = maxDate;
         dateInput.min = minDate;
-        dateInput.value = maxDate; // 預設今天
-
+        dateInput.value = maxDate;
         dlDateInput.value = maxDate;
 
-        // 連動下載日期
         dateInput.addEventListener('change', (e) => {
             dlDateInput.value = e.target.value;
         });
     });
 
-    // 3. 切換攝影機
     function loadCamera(name, mode) {
-        // 更新 UI 標題
         document.getElementById('currentCamTitle').innerHTML = `<i class="fas fa-camera me-2"></i>${name}`;
-        
-        // 更新選單 Active 狀態
         document.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
         event.currentTarget.classList.add('active');
-
-        // 重置播放器狀態
         document.getElementById('playerStatusText').innerText = "正在緩衝影像資料...";
         setTimeout(() => {
              const status = document.getElementById('tabLive').classList.contains('active') ? "正在播放即時串流" : "已暫停 (請選擇時間)";
@@ -264,7 +273,6 @@
         }, 800);
     }
 
-    // 4. 切換模式 (即時/歷史)
     function switchMode(mode) {
         const liveTab = document.getElementById('tabLive');
         const historyTab = document.getElementById('tabHistory');
@@ -277,63 +285,48 @@
         if (mode === 'live') {
             liveTab.classList.add('active');
             historyTab.classList.remove('active');
-            
             liveBadge.style.display = 'block';
             historyBadge.style.display = 'none';
             historyControls.style.display = 'none';
             downloadSection.style.display = 'none';
-            
             playerText.innerText = "正在播放即時串流...";
         } else {
             liveTab.classList.remove('active');
             historyTab.classList.add('active');
-            
             liveBadge.style.display = 'none';
             historyBadge.style.display = 'block';
             historyControls.style.display = 'block';
-            downloadSection.style.display = 'block'; // 顯示下載區
-            
+            downloadSection.style.display = 'block';
             playerText.innerText = "歷史回放模式 - 請選擇下方時間";
         }
     }
 
-    // 5. 下載驗證邏輯 (核心需求: 不超過 10 分鐘)
     function validateAndDownload() {
         const date = document.getElementById('dlDate').value;
         const start = document.getElementById('dlStartTime').value;
         const end = document.getElementById('dlEndTime').value;
         const msgBox = document.getElementById('dlMsg');
 
-        if (!date || !start || !end) {
-            alert("請完整選擇日期與時間區間");
-            return;
-        }
+        if (!date || !start || !end) { alert("請完整選擇日期與時間區間"); return; }
 
-        // 計算時間差
         const startDate = new Date(`2000-01-01T${start}`);
         const endDate = new Date(`2000-01-01T${end}`);
         const diffMs = endDate - startDate;
         const diffMins = diffMs / 1000 / 60;
 
-        msgBox.className = "mt-2 small fw-bold"; // 重置樣式
-
+        msgBox.className = "mt-2 small fw-bold";
         if (diffMs <= 0) {
             msgBox.innerText = "錯誤：結束時間必須晚於開始時間";
             msgBox.classList.add("text-danger");
             return;
         }
-
         if (diffMins > 10) {
-            // 超過 10 分鐘 -> 阻擋
             msgBox.innerText = `錯誤：選擇片段長度為 ${diffMins.toFixed(1)} 分鐘，超過系統限制 (10分鐘)。`;
             msgBox.classList.add("text-danger");
             alert("下載失敗：單次調閱長度不可超過 10 分鐘！");
         } else {
-            // 成功
             msgBox.innerText = `驗證成功 (長度 ${diffMins.toFixed(1)} 分鐘)，正在打包下載...`;
             msgBox.classList.add("text-success");
-            
-            // 模擬下載動作
             setTimeout(() => {
                 const link = document.createElement("a");
                 link.href = "#";
@@ -343,6 +336,5 @@
         }
     }
 </script>
-
 </body>
 </html>
